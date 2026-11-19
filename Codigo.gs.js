@@ -9,7 +9,7 @@
 
 // CONFIGURACIÓN PRINCIPAL (Reemplazar con el ID real del Google Sheets)
 const CONFIG = {
-  SPREADSHEET_ID: 'REEMPLAZAR_CON_EL_ID_DE_TU_GOOGLE_SHEET',
+  SPREADSHEET_ID: 'https://script.google.com/macros/s/AKfycbyROhN-dK-8Xg4K2q5VBOS90YqLUecINScOs5Hsaiqs6cmVUndtVtLi-Tw4MBzrRcHO/exec',
   API_SECRET_TOKEN: '', // Opcional: Si se define, el frontend debe enviarlo en el header/body
   SHEETS: {
     MODULOS: 'maestro-modulos',
