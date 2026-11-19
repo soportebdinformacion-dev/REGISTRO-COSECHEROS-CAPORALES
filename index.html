@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="theme-color" content="#DA291C" />
+  <meta name="description" content="Reporte de Cosechadores - Registro offline-first para Caporales(as) de Agrícola Huarmey" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Cosechadores" />
+  <title>REPORTE DE COSECHADORES | Registro para Caporales(as)</title>
+
+  <!-- Tailwind CSS para diseño responsivo y de alto contraste en campo -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Fuente Inter para máxima legibilidad bajo luz solar -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            huarmey: {
+              red: '#DA291C',
+              redDark: '#B51F14',
+              redLight: '#FDECEB',
+              green: '#78BE20',
+              greenDark: '#5E9816',
+              greenLight: '#F1F9E7',
+              gray: '#8A8178',
+              grayDark: '#5C554F',
+              bg: '#F5F6F2',
+              card: '#FFFFFF'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Fondo natural suave y alto contraste para trabajo en campo */
+    body {
+      background-color: #F5F6F2;
+      color: #1F2937;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Controles táctiles grandes optimizados para móviles */
+    select, input[type="date"], input[type="number"] {
+      min-height: 52px;
+      font-size: 16px;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(-10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .toast-enter {
+      animation: slideIn 0.25s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-huarmey-green selection:text-white">
+
+  <div class="w-full max-w-2xl mx-auto px-4 py-4 sm:py-6 flex-grow">
+    
+    <!-- ENCABEZADO INSTITUCIONAL -->
+    <header class="bg-white rounded-2xl shadow-sm border border-stone-200 p-4 sm:p-6 mb-4 text-center relative overflow-hidden">
+      <div class="absolute top-0 left-0 right-0 h-1.5 flex">
+        <div class="w-1/2 bg-huarmey-red"></div>
+        <div class="w-1/2 bg-huarmey-green"></div>
+      </div>
+
+      <!-- Logotipo Institucional (LOGO HUARMEY.png con respaldo vectorial exacto) -->
+      <div class="flex justify-center items-center mb-3 mt-1">
+        <img 
+          src="LOGO HUARMEY.png" 
+          alt="Logo Agrícola Huarmey" 
+          class="h-20 sm:h-24 w-auto object-contain"
+          onerror="this.style.display='none'; document.getElementById('logo-svg-fallback').style.display='flex';"
+        />
+        <div id="logo-svg-fallback" class="hidden flex-col items-center justify-center">
+          <svg class="h-16 w-auto" viewBox="0 0 220 150" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Agrícola Huarmey">
+            <path d="M112 42C112 22 132 10 148 12C146 28 130 42 112 42Z" fill="#388E1C"/>
+            <path d="M112 42C122 30 135 20 146 14" stroke="#78BE20" stroke-width="2" stroke-linecap="round"/>
+            <path d="M92 52C108 62 136 58 148 46C145 64 115 74 92 52Z" fill="#DA291C"/>
+            <path d="M84 74C108 88 144 82 158 66C154 90 114 102 84 74Z" fill="#DA291C"/>
+            <path d="M90 98C114 112 142 106 152 92C146 114 112 122 90 98Z" fill="#DA291C"/>
+            <path d="M82 32C62 54 64 96 96 118C74 94 72 56 82 32Z" fill="#388E1C"/>
+            <path d="M98 44C76 62 76 98 106 116C84 96 84 64 98 44Z" fill="#5E9816"/>
+          </svg>
+          <span class="text-xl sm:text-2xl font-bold tracking-tight text-huarmey-gray mt-1">Agrícola Huarmey</span>
+        </div>
+      </div>
+
+      <!-- Título y Subtítulo -->
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight uppercase text-center">
+        REPORTE DE COSECHADORES
+      </h1>
+      <p class="text-base sm:text-lg font-semibold text-huarmey-gray mt-1">
+        Registro para Caporales (as)
+      </p>
+
+      <!-- BARRA DE ESTADO DE CONEXIÓN Y DATOS MAESTROS -->
+      <div class="mt-4 pt-3 border-t border-stone-100 flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm">
+        <div id="network-badge" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-semibold bg-huarmey-greenLight text-emerald-900 border border-huarmey-green/40">
+          <span id="network-icon" aria-hidden="true">🟢</span>
+          <span id="network-text">En línea</span>
+        </div>
+
+        <div class="flex items-center gap-2 text-stone-600">
+          <span id="masters-status-text" class="text-xs">Maestros: Cargando...</span>
+          <button 
+            type="button" 
+            id="btn-refresh-masters"
+            title="Actualizar listas desde servidor"
+            class="p-2 rounded-lg bg-huarmey-greenLight hover:bg-huarmey-green/20 active:bg-huarmey-green/30 text-stone-800 border border-huarmey-green/30 transition flex items-center gap-1 font-semibold text-xs"
+          >
+            <svg class="w-4 h-4 text-huarmey-greenDark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            <span>Actualizar Listas</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ALERTA DINÁMICA -->
+    <div id="feedback-banner" class="hidden mb-4 p-4 rounded-xl border font-medium text-sm sm:text-base toast-enter" role="alert"></div>
+
+    <!-- PESTAÑAS DE NAVEGACIÓN -->
+    <nav class="grid grid-cols-2 gap-2 bg-stone-200/80 p-1.5 rounded-xl mb-4" aria-label="Vistas principales">
+      <button 
+        type="button" 
+        id="tab-form" 
+        class="py-3 px-3 rounded-lg font-bold text-sm sm:text-base bg-white text-stone-900 shadow-sm transition flex items-center justify-center gap-2"
+      >
+        <svg class="w-5 h-5 text-huarmey-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+        <span>Nuevo Registro</span>
+      </button>
+      <button 
+        type="button" 
+        id="tab-records" 
+        class="py-3 px-3 rounded-lg font-bold text-sm sm:text-base text-stone-600 hover:text-stone-900 transition flex items-center justify-center gap-2"
+      >
+        <svg class="w-5 h-5 text-huarmey-greenDark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+        <span>Mis Registros</span>
+        <span id="badge-pending-count" class="px-2 py-0.5 text-xs font-extrabold rounded-full bg-huarmey-red text-white">0</span>
+      </button>
+    </nav>
+
+    <!-- VISTA 1: FORMULARIO DE REGISTRO PARA CAPORALES -->
+    <main id="view-form" class="bg-white rounded-2xl shadow-sm border border-stone-200 p-5 sm:p-6">
+      <form id="harvest-form" novalidate class="space-y-5">
+        
+        <!-- 1. FECHA REGISTRO -->
+        <div>
+          <label for="fecha_registro" class="flex items-center gap-2 text-sm sm:text-base font-bold text-stone-800 mb-1.5">
+            <svg class="w-5 h-5 text-huarmey-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <span>FECHA REGISTRO <span class="text-huarmey-red">*</span></span>
+          </label>
+          <input 
+            type="date" 
+            id="fecha_registro" 
+            name="fecha_registro" 
+            required
+            class="w-full px-4 py-3 rounded-xl border-2 border-stone-300 bg-huarmey-greenLight/30 focus:bg-white focus:border-huarmey-green focus:outline-none font-semibold text-stone-900 transition"
+          />
+          <p id="err-fecha" class="hidden text-xs font-semibold text-huarmey-red mt-1"></p>
+        </div>
+
+        <!-- 2. SUPERVISOR -->
+        <div>
+          <label for="supervisor" class="flex items-center gap-2 text-sm sm:text-base font-bold text-stone-800 mb-1.5">
+            <svg class="w-5 h-5 text-huarmey-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+            <span>SUPERVISOR <span class="text-huarmey-red">*</span></span>
+          </label>
+          <select 
+            id="supervisor" 
+            name="supervisor" 
+            required
+            class="w-full px-4 py-3 rounded-xl border-2 border-stone-300 bg-stone-50 focus:bg-white focus:border-huarmey-green focus:outline-none font-semibold text-stone-900 transition"
+          >
+            <option value="">-- Seleccione Supervisor --</option>
+            <option value="Frank Farroñan">Frank Farroñan</option>
+            <option value="Roni Cubas">Roni Cubas</option>
+          </select>
+          <p id="err-supervisor" class="hidden text-xs font-semibold text-huarmey-red mt-1"></p>
+        </div>
+
+        <!-- 3. MODULO -TURNO -->
+        <div>
+          <label for="modulo_turno" class="flex items-center gap-2 text-sm sm:text-base font-bold text-stone-800 mb-1.5">
+            <svg class="w-5 h-5 text-huarmey-greenDark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <span>MODULO -TURNO <span class="text-huarmey-red">*</span></span>
+          </label>
+          <select 
+            id="modulo_turno" 
+            name="modulo_turno" 
+            required
+            class="w-full px-4 py-3 rounded-xl border-2 border-stone-300 bg-stone-50 focus:bg-white focus:border-huarmey-green focus:outline-none font-semibold text-stone-900 transition"
+          >
+            <option value="">-- Seleccione Módulo - Turno --</option>
+          </select>
+          <p id="err-modulo" class="hidden text-xs font-semibold text-huarmey-red mt-1"></p>
+        </div>
+
+        <!-- 4. DATOS ACOPIADOR -->
+        <div>
+          <label for="datos_acopiador" class="flex items-center gap-2 text-sm sm:text-base font-bold text-stone-800 mb-1.5">
+            <svg class="w-5 h-5 text-huarmey-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            <span>DATOS ACOPIADOR <span class="text-huarmey-red">*</span></span>
+          </label>
+          <select 
+            id="datos_acopiador" 
+            name="datos_acopiador" 
+            required
+            class="w-full px-4 py-3 rounded-xl border-2 border-stone-300 bg-stone-50 focus:bg-white focus:border-huarmey-green focus:outline-none font-semibold text-stone-900 transition"
+          >
+            <option value="">-- Seleccione Acopiador(a) --</option>
+          </select>
+          <p id="err-acopiador" class="hidden text-xs font-semibold text-huarmey-red mt-1"></p>
+        </div>
+
+        <!-- 5. DATOS CAPORAL -->
+        <div>
+          <label for="datos_caporal" class="flex items-center gap-2 text-sm sm:text-base font-bold text-stone-800 mb-1.5">
+            <svg class="w-5 h-5 text-huarmey-grayDark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <span>DATOS CAPORAL <span class="text-huarmey-red">*</span></span>
+          </label>
+          <select 
+            id="datos_caporal" 
+            name="datos_caporal" 
+            required
+            class="w-full px-4 py-3 rounded-xl border-2 border-stone-300 bg-stone-50 focus:bg-white focus:border-huarmey-green focus:outline-none font-semibold text-stone-900 transition"
+          >
+            <option value="">-- Seleccione Caporal --</option>
+          </select>
+          <p id="err-caporal" class="hidden text-xs font-semibold text-huarmey-red mt-1"></p>
+        </div>
+
+        <!-- 6. MODALIDAD -->
+        <div>
+          <label for="modalidad" class="flex items-center gap-2 text-sm sm:text-base font-bold text-stone-800 mb-1.5">
+            <svg class="w-5 h-5 text-huarmey-greenDark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            <span>MODALIDAD <span class="text-huarmey-red">*</span></span>
+          </label>
+          <select 
+            id="modalidad" 
+            name="modalidad" 
+            required
+            class="w-full px-4 py-3 rounded-xl border-2 border-stone-300 bg-stone-50 focus:bg-white focus:border-huarmey-green focus:outline-none font-semibold text-stone-900 transition"
+          >
+            <option value="">-- Seleccione Modalidad --</option>
+            <option value="CAMPAMENTO">CAMPAMENTO</option>
+            <option value="IDA Y VUELTA">IDA Y VUELTA</option>
+          </select>
+          <p id="err-modalidad" class="hidden text-xs font-semibold text-huarmey-red mt-1"></p>
+        </div>
+
+        <!-- 7. TOTAL (Entero positivo) -->
+        <div>
+          <label for="total_cosecha" class="flex items-center gap-2 text-sm sm:text-base font-bold text-stone-800 mb-1.5">
+            <svg class="w-5 h-5 text-huarmey-greenDark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path></svg>
+            <span>TOTAL <span class="text-huarmey-red">*</span></span>
+          </label>
+          <input 
+            type="number" 
+            id="total_cosecha" 
+            name="total_cosecha" 
+            inputmode="numeric" 
+            pattern="[0-9]*"
+            min="1" 
+            step="1"
+            placeholder="Ej: 45"
+            required
+            class="w-full px-4 py-3 rounded-xl border-2 border-stone-300 bg-huarmey-redLight/25 focus:bg-white focus:border-huarmey-green focus:outline-none font-bold text-xl text-stone-900 transition"
+          />
+          <p class="text-xs text-stone-500 mt-1">Ingrese solo números enteros positivos (sin decimales).</p>
+          <p id="err-total" class="hidden text-xs font-semibold text-huarmey-red mt-1"></p>
+        </div>
+
+        <!-- ACCIONES PRINCIPALES -->
+        <div class="pt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <button 
+            type="submit" 
+            id="btn-save"
+            class="sm:col-span-2 py-4 px-6 rounded-xl bg-huarmey-green hover:bg-huarmey-greenDark active:scale-[0.99] text-white font-extrabold text-base sm:text-lg shadow-md transition flex items-center justify-center gap-2"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            <span>GUARDAR REGISTRO</span>
+          </button>
+
+          <button 
+            type="button" 
+            id="btn-clear"
+            class="py-4 px-4 rounded-xl bg-huarmey-redLight hover:bg-red-100 active:scale-[0.99] text-huarmey-red font-bold text-sm sm:text-base border border-huarmey-red/20 transition flex items-center justify-center gap-1.5"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            <span>LIMPIAR</span>
+          </button>
+        </div>
+      </form>
+    </main>
+
+    <!-- VISTA 2: BANDEJA DE REGISTROS LOCALES Y SINCRONIZACIÓN -->
+    <section id="view-records" class="hidden space-y-4">
+      
+      <!-- Contadores de Estado -->
+      <div class="grid grid-cols-3 gap-2.5">
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-center">
+          <div class="text-xs font-bold text-amber-800 uppercase">Pendiente</div>
+          <div id="stat-pending" class="text-2xl font-extrabold text-amber-600 mt-0.5">0</div>
+        </div>
+        <div class="bg-huarmey-greenLight border border-huarmey-green/40 rounded-xl p-3 text-center">
+          <div class="text-xs font-bold text-emerald-900 uppercase">Sincronizado</div>
+          <div id="stat-synced" class="text-2xl font-extrabold text-huarmey-greenDark mt-0.5">0</div>
+        </div>
+        <div class="bg-huarmey-redLight border border-huarmey-red/30 rounded-xl p-3 text-center">
+          <div class="text-xs font-bold text-huarmey-red uppercase">Error</div>
+          <div id="stat-error" class="text-2xl font-extrabold text-huarmey-red mt-0.5">0</div>
+        </div>
+      </div>
+
+      <!-- Botón de Sincronización Manual -->
+      <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="text-sm text-stone-600">
+          <p class="font-bold text-stone-800">Sincronización con Servidor</p>
+          <p id="sync-subtext" class="text-xs">Los registros pendientes se envían automáticamente al detectar internet.</p>
+        </div>
+        <button 
+          type="button" 
+          id="btn-sync-now"
+          class="w-full sm:w-auto py-3 px-5 rounded-xl bg-huarmey-red hover:bg-huarmey-redDark disabled:opacity-50 text-white font-bold text-sm shadow-sm transition flex items-center justify-center gap-2"
+        >
+          <svg id="sync-spinner" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          <span>SINCRONIZAR AHORA</span>
+        </button>
+      </div>
+
+      <!-- Lista de Registros -->
+      <div id="records-list" class="space-y-3"></div>
+    </section>
+
+    <!-- CONFIGURACIÓN DE CONEXIÓN API -->
+    <details class="mt-6 bg-white rounded-xl border border-stone-200 p-4 text-xs text-stone-600">
+      <summary class="font-bold text-stone-700 cursor-pointer select-none flex items-center justify-between">
+        <span>⚙️ Configuración de Conexión API (Google Apps Script)</span>
+        <span id="api-status-dot" class="text-amber-600 font-semibold">Pendiente configurar URL</span>
+      </summary>
+      <div class="mt-3 pt-3 border-t border-stone-100 space-y-2.5">
+        <div>
+          <label for="api-url-input" class="block font-semibold text-stone-700 mb-1">URL de Implementación Web App (Apps Script):</label>
+          <input 
+            type="url" 
+            id="api-url-input" 
+            placeholder="https://script.google.com/macros/s/AKfycb.../exec"
+            class="w-full p-2.5 rounded-lg border border-stone-300 text-xs font-mono bg-stone-50"
+          />
+        </div>
+        <div>
+          <label for="api-token-input" class="block font-semibold text-stone-700 mb-1">Token de Seguridad (Opcional, si configuraste API_SECRET_TOKEN):</label>
+          <input 
+            type="password" 
+            id="api-token-input" 
+            placeholder="Dejar vacío si no usas token"
+            class="w-full p-2.5 rounded-lg border border-stone-300 text-xs font-mono bg-stone-50"
+          />
+        </div>
+        <div class="flex justify-between items-center pt-1">
+          <button type="button" id="btn-save-api-url" class="px-4 py-2 bg-stone-800 text-white rounded-lg font-bold hover:bg-stone-900">
+            Guardar Configuración
+          </button>
+          <button type="button" id="btn-install-pwa" class="hidden px-4 py-2 bg-huarmey-green text-white rounded-lg font-bold">
+            📲 Instalar App en Dispositivo
+          </button>
+        </div>
+      </div>
+    </details>
+
+  </div>
+
+  <!-- PIE DE PÁGINA -->
+  <footer class="text-center py-4 px-4 text-xs text-huarmey-gray border-t border-stone-200 bg-white/60">
+    <p class="font-semibold">Agrícola Huarmey &copy; <span id="year-copy"></span> — Registro para Caporales(as)</p>
+    <p class="mt-0.5">Modo Offline-First Activo • Almacenamiento Seguro IndexedDB</p>
+  </footer>
+
+  <script>
+    /**
+     * ============================================================================
+     * CONFIGURACIÓN E INICIALIZACIÓN PWA (MANIFEST + SERVICE WORKER DINÁMICOS)
+     * ============================================================================
+     */
+    const APP_CONFIG = {
+      DEFAULT_API_URL: 'https://script.google.com/macros/s/REEMPLAZAR_CON_TU_ID_DE_DESPLIEGUE/exec',
+      DB_NAME: 'HuarmeyCaporalDB',
+      DB_VERSION: 1,
+      BATCH_SIZE: 25,
+      MAX_JITTER_MS: 8000, // Dispersión aleatoria para soportar 200 usuarios concurrentes
+      MAX_RETRIES: 5,
+      SUPERVISORES_LIST: ['Frank Farroñan', 'Roni Cubas'],
+      MODALIDADES_LIST: ['CAMPAMENTO', 'IDA Y VUELTA']
+    };
+
+    const ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="96" fill="#ffffff"/><path d="M262 135c0-55 55-88 98-82-6 44-50 82-98 82z" fill="#388E1C"/><path d="M208 162c44 27 120 16 152-16-8 49-89 76-152 16z" fill="#DA291C"/><path d="M186 221c65 38 163 22 201-21-11 65-119 98-201 21z" fill="#DA291C"/><path d="M202 286c65 38 141 22 168-16-16 60-108 81-168 16z" fill="#DA291C"/><path d="M181 108c-54 59-49 173 38 232-60-65-65-167-38-232z" fill="#388E1C"/></svg>`;
+    const ICON_URL = 'data:image/svg+xml;base64,' + btoa(ICON_SVG);
+
+    // Manifest dinámico
+    (function setupManifest() {
+      const manifest = {
+        name: 'REPORTE DE COSECHADORES - Caporales Agrícola Huarmey',
+        short_name: 'Cosechadores',
+        description: 'Registro diario offline-first para Caporales(as) de Agrícola Huarmey',
+        start_url: './',
+        display: 'standalone',
+        background_color: '#F5F6F2',
+        theme_color: '#DA291C',
+        orientation: 'portrait',
+        icons: [
+          { src: ICON_URL, sizes: '192x192', type: 'image/svg+xml', purpose: 'any maskable' },
+          { src: ICON_URL, sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
+        ]
+      };
+      const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+      const link = document.createElement('link');
+      link.rel = 'manifest';
+      link.href = URL.createObjectURL(blob);
+      document.head.appendChild(link);
+    })();
+
+    // Service Worker dinámico
+    (function registerSW() {
+      if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+        const swCode = `
+          const CACHE_NAME = 'huarmey-caporal-pwa-v1';
+          const ASSETS = ['./', 'https://cdn.tailwindcss.com'];
+          self.addEventListener('install', (e) => {
+            e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)).catch(() => {}));
+            self.skipWaiting();
+          });
+          self.addEventListener('activate', (e) => {
+            e.waitUntil(self.clients.claim());
+          });
+          self.addEventListener('fetch', (e) => {
+            if (e.request.method !== 'GET') return;
+            e.respondWith(
+              fetch(e.request)
+                .then(res => {
+                  const clone = res.clone();
+                  caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
+                  return res;
+                })
+                .catch(() => caches.match(e.request))
+            );
+          });
+        `;
+        const swBlob = new Blob([swCode], { type: 'application/javascript' });
+        navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(err => {
+          console.warn('SW registro omitido en entorno sandbox:', err.message);
+        });
+      }
+    })();
+
+    /**
+     * ============================================================================
+     * CAPA DE PERSISTENCIA LOCAL (INDEXEDDB)
+     * ============================================================================
+     */
+    const DB = {
+      instance: null,
+
+      async open() {
+        if (this.instance) return this.instance;
+        return new Promise((resolve, reject) => {
+          const req = indexedDB.open(APP_CONFIG.DB_NAME, APP_CONFIG.DB_VERSION);
+          req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains('maestros')) {
+              db.createObjectStore('maestros', { keyPath: 'id' });
+            }
+            if (!db.objectStoreNames.contains('registros')) {
+              const store = db.createObjectStore('registros', { keyPath: 'uuid' });
+              store.createIndex('estado', 'estado', { unique: false });
+              store.createIndex('createdAt', 'createdAt', { unique: false });
+            }
+          };
+          req.onsuccess = (e) => {
+            this.instance = e.target.result;
+            resolve(this.instance);
+          };
+          req.onerror = (e) => reject(e.target.error);
+        });
+      },
+
+      async saveMaestros(data) {
+        const db = await this.open();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction('maestros', 'readwrite');
+          tx.objectStore('maestros').put({
+            id: 'catalogos',
+            supervisores: data.supervisores && data.supervisores.length ? data.supervisores : APP_CONFIG.SUPERVISORES_LIST,
+            modalidades: data.modalidades && data.modalidades.length ? data.modalidades : APP_CONFIG.MODALIDADES_LIST,
+            modulos: data.modulos || [],
+            acopiadores: data.acopiadores || [],
+            caporales: data.caporales || [],
+            updatedAt: new Date().toISOString()
+          });
+          tx.oncomplete = () => resolve();
+          tx.onerror = (e) => reject(e.target.error);
+        });
+      },
+
+      async getMaestros() {
+        const db = await this.open();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction('maestros', 'readonly');
+          const req = tx.objectStore('maestros').get('catalogos');
+          req.onsuccess = () => resolve(req.result || null);
+          req.onerror = (e) => reject(e.target.error);
+        });
+      },
+
+      async putRegistro(registro) {
+        const db = await this.open();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction('registros', 'readwrite');
+          tx.objectStore('registros').put(registro);
+          tx.oncomplete = () => resolve(registro);
+          tx.onerror = (e) => reject(e.target.error);
+        });
+      },
+
+      async getAllRegistros() {
+        const db = await this.open();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction('registros', 'readonly');
+          const req = tx.objectStore('registros').getAll();
+          req.onsuccess = () => {
+            const list = req.result || [];
+            list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            resolve(list);
+          };
+          req.onerror = (e) => reject(e.target.error);
+        });
+      }
+    };
+
+    /**
+     * ============================================================================
+     * UTILIDADES Y VALIDACIONES
+     * ============================================================================
+     */
+    function generateUUID() {
+      if (crypto && crypto.randomUUID) return crypto.randomUUID();
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+      });
+    }
+
+    function getTodayLocalISO() {
+      const now = new Date();
+      const offset = now.getTimezoneOffset() * 60000;
+      return new Date(now - offset).toISOString().split('T')[0];
+    }
+
+    function getApiUrl() {
+      return localStorage.getItem('HUARMEY_CAPORAL_API_URL') || APP_CONFIG.DEFAULT_API_URL;
+    }
+
+    function getApiToken() {
+      return localStorage.getItem('HUARMEY_CAPORAL_API_TOKEN') || '';
+    }
+
+    function isApiConfigured() {
+      const url = getApiUrl();
+      return url && url.startsWith('https://script.google.com/') && !url.includes('REEMPLAZAR_CON_TU_ID');
+    }
+
+    function showFeedback(message, type = 'success') {
+      const banner = document.getElementById('feedback-banner');
+      banner.classList.remove('hidden', 'bg-huarmey-greenLight', 'border-huarmey-green/40', 'text-emerald-950', 'bg-huarmey-redLight', 'border-huarmey-red/40', 'text-red-950', 'bg-amber-50', 'border-amber-300', 'text-amber-900');
+      
+      if (type === 'success') {
+        banner.classList.add('bg-huarmey-greenLight', 'border-huarmey-green/40', 'text-emerald-950');
+        banner.innerHTML = `✅ ${message}`;
+      } else if (type === 'error') {
+        banner.classList.add('bg-huarmey-redLight', 'border-huarmey-red/40', 'text-red-950');
+        banner.innerHTML = `⚠️ ${message}`;
+      } else {
+        banner.classList.add('bg-amber-50', 'border-amber-300', 'text-amber-900');
+        banner.innerHTML = `ℹ️ ${message}`;
+      }
+
+      clearTimeout(window._feedbackTimer);
+      window._feedbackTimer = setTimeout(() => {
+        banner.classList.add('hidden');
+      }, 6000);
+    }
+
+    /**
+     * ============================================================================
+     * GESTIÓN DE DATOS MAESTROS (ONLINE + RESPALDO OFFLINE)
+     * ============================================================================
+     */
+    function populateSelect(selectId, items, placeholder) {
+      const select = document.getElementById(selectId);
+      const currentVal = select.value;
+      const cleanItems = [...new Set((items || []).map(v => String(v).trim()).filter(Boolean))];
+      
+      select.innerHTML = `<option value="">${placeholder}</option>`;
+      cleanItems.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item;
+        opt.textContent = item;
+        select.appendChild(opt);
+      });
+
+      if (cleanItems.includes(currentVal)) {
+        select.value = currentVal;
+      }
+    }
+
+    async function loadMastersFromCache() {
+      // Listas estáticas siempre disponibles offline desde el inicio
+      populateSelect('supervisor', APP_CONFIG.SUPERVISORES_LIST, '-- Seleccione Supervisor --');
+      populateSelect('modalidad', APP_CONFIG.MODALIDADES_LIST, '-- Seleccione Modalidad --');
+
+      const cached = await DB.getMaestros();
+      const statusEl = document.getElementById('masters-status-text');
+      
+      if (cached) {
+        const supList = (cached.supervisores && cached.supervisores.length) ? cached.supervisores : APP_CONFIG.SUPERVISORES_LIST;
+        const modList = (cached.modalidades && cached.modalidades.length) ? cached.modalidades : APP_CONFIG.MODALIDADES_LIST;
+        
+        populateSelect('supervisor', supList, '-- Seleccione Supervisor --');
+        populateSelect('modalidad', modList, '-- Seleccione Modalidad --');
+        populateSelect('modulo_turno', cached.modulos, '-- Seleccione Módulo - Turno --');
+        populateSelect('datos_acopiador', cached.acopiadores, '-- Seleccione Acopiador(a) --');
+        populateSelect('datos_caporal', cached.caporales, '-- Seleccione Caporal --');
+        
+        const dateObj = new Date(cached.updatedAt);
+        const formatted = dateObj.toLocaleDateString('es-PE') + ' ' + dateObj.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
+        statusEl.textContent = `Listas locales: ${formatted}`;
+        return true;
+      } else {
+        statusEl.textContent = 'Sin listas de Sheets locales';
+        return false;
+      }
+    }
+
+    async function fetchMastersFromServer(manual = false) {
+      if (!navigator.onLine) {
+        if (manual) showFeedback('Sin conexión a internet. Usando listas guardadas en el dispositivo.', 'warning');
+        return;
+      }
+      if (!isApiConfigured()) {
+        if (manual) showFeedback('Configure primero la URL de Google Apps Script en la parte inferior.', 'warning');
+        return;
+      }
+
+      const btn = document.getElementById('btn-refresh-masters');
+      btn.disabled = true;
+      btn.classList.add('opacity-50');
+
+      try {
+        const url = `${getApiUrl()}?action=getMaestros&t=${Date.now()}`;
+        const response = await fetch(url, { method: 'GET', redirect: 'follow' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        
+        const rawText = await response.text();
+        let result;
+        try {
+          result = JSON.parse(rawText);
+        } catch (parseErr) {
+          throw new Error('Google devolvió HTML en vez de JSON. Verifica que el despliegue tenga acceso para "Cualquier usuario" y termine en /exec.');
+        }
+
+        if (result.status !== 'ok') throw new Error(result.message || 'Error al obtener maestros');
+
+        await DB.saveMaestros(result.data);
+        await loadMastersFromCache();
+        if (manual) showFeedback('Listas maestras actualizadas correctamente.', 'success');
+      } catch (err) {
+        console.error('Error cargando maestros:', err);
+        if (manual) showFeedback(`No se pudieron descargar las listas: ${err.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('opacity-50');
+      }
+    }
+
+    /**
+     * ============================================================================
+     * MOTOR DE SINCRONIZACIÓN CON JITTER, BATCHING E IDEMPOTENCIA
+     * ============================================================================
+     */
+    let isSyncing = false;
+
+    async function syncPendingRecords(isManual = false) {
+      if (isSyncing) return;
+      if (!navigator.onLine) {
+        if (isManual) showFeedback('No hay conexión a internet. Los registros siguen seguros en el teléfono.', 'warning');
+        return;
+      }
+      if (!isApiConfigured()) {
+        if (isManual) showFeedback('Falta configurar la URL del servidor Google Apps Script.', 'error');
+        return;
+      }
+
+      const all = await DB.getAllRegistros();
+      const pending = all.filter(r => r.estado === 'Pendiente' || (r.estado === 'Error' && (r.retries || 0) < APP_CONFIG.MAX_RETRIES));
+
+      if (pending.length === 0) {
+        if (isManual) showFeedback('Todos los registros ya están sincronizados.', 'success');
+        return;
+      }
+
+      isSyncing = true;
+      const btnSync = document.getElementById('btn-sync-now');
+      const spinner = document.getElementById('sync-spinner');
+      btnSync.disabled = true;
+      spinner.classList.add('animate-spin');
+
+      try {
+        if (!isManual) {
+          const jitterDelay = Math.floor(Math.random() * APP_CONFIG.MAX_JITTER_MS);
+          document.getElementById('sync-subtext').textContent = `Esperando turno de red (${Math.round(jitterDelay/1000)}s) para evitar saturación...`;
+          await new Promise(res => setTimeout(res, jitterDelay));
+        }
+
+        document.getElementById('sync-subtext').textContent = 'Enviando registros al servidor...';
+
+        for (let i = 0; i < pending.length; i += APP_CONFIG.BATCH_SIZE) {
+          const batch = pending.slice(i, i + APP_CONFIG.BATCH_SIZE);
+          
+          const payload = {
+            action: 'syncBatch',
+            token: getApiToken(),
+            records: batch.map(r => ({
+              uuid: r.uuid,
+              fechaRegistro: r.fechaRegistro,
+              supervisor: r.supervisor,
+              moduloTurno: r.moduloTurno,
+              datosAcopiador: r.datosAcopiador,
+              datosCaporal: r.datosCaporal,
+              modalidad: r.modalidad,
+              total: r.total
+            }))
+          };
+
+          const response = await fetch(getApiUrl(), {
+            method: 'POST',
+            redirect: 'follow',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload)
+          });
+
+          if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
+          const result = await response.json();
+
+          if (result.status === 'ok' && Array.isArray(result.results)) {
+            for (const itemRes of result.results) {
+              const original = batch.find(b => b.uuid === itemRes.uuid);
+              if (!original) continue;
+
+              if (itemRes.status === 'SYNCED' || itemRes.status === 'DUPLICATE_IGNORED') {
+                original.estado = 'Sincronizado';
+                original.syncedAt = new Date().toISOString();
+                original.errorMsg = null;
+              } else {
+                original.estado = 'Error';
+                original.retries = (original.retries || 0) + 1;
+                original.errorMsg = itemRes.message || 'Rechazado por validación del servidor';
+              }
+              await DB.putRegistro(original);
+            }
+          } else {
+            throw new Error(result.message || 'Respuesta inválida del servidor');
+          }
+        }
+
+        await renderRecordsUI();
+        if (isManual) showFeedback('Sincronización completada con éxito.', 'success');
+      } catch (err) {
+        console.error('Fallo en sincronización:', err);
+        for (const r of pending) {
+          r.retries = (r.retries || 0) + 1;
+          r.errorMsg = `Fallo de red/servidor: ${err.message}`;
+          if (r.retries >= APP_CONFIG.MAX_RETRIES) r.estado = 'Error';
+          await DB.putRegistro(r);
+        }
+        await renderRecordsUI();
+        if (isManual) showFeedback('No se pudo completar el envío. Los datos siguen guardados localmente.', 'error');
+      } finally {
+        isSyncing = false;
+        btnSync.disabled = false;
+        spinner.classList.remove('animate-spin');
+        document.getElementById('sync-subtext').textContent = 'Los registros pendientes se envían automáticamente al detectar internet.';
+      }
+    }
+
+    /**
+     * ============================================================================
+     * INTERFAZ DE USUARIO Y VALIDACIÓN DE FORMULARIO
+     * ============================================================================
+     */
+    function clearValidationErrors() {
+      ['err-fecha', 'err-supervisor', 'err-modulo', 'err-acopiador', 'err-caporal', 'err-modalidad', 'err-total'].forEach(id => {
+        const el = document.getElementById(id);
+        el.textContent = '';
+        el.classList.add('hidden');
+      });
+    }
+
+    function showFieldError(id, msg) {
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+
+    function resetFormForNextEntry() {
+      document.getElementById('fecha_registro').value = getTodayLocalISO();
+      document.getElementById('supervisor').value = '';
+      document.getElementById('modulo_turno').value = '';
+      document.getElementById('datos_acopiador').value = '';
+      document.getElementById('datos_caporal').value = '';
+      document.getElementById('modalidad').value = '';
+      document.getElementById('total_cosecha').value = '';
+      clearValidationErrors();
+    }
+
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      clearValidationErrors();
+
+      const fecha = document.getElementById('fecha_registro').value.trim();
+      const supervisor = document.getElementById('supervisor').value.trim();
+      const modulo = document.getElementById('modulo_turno').value.trim();
+      const acopiador = document.getElementById('datos_acopiador').value.trim();
+      const caporal = document.getElementById('datos_caporal').value.trim();
+      const modalidad = document.getElementById('modalidad').value.trim();
+      const totalRaw = document.getElementById('total_cosecha').value.trim();
+
+      let hasError = false;
+
+      if (!fecha) {
+        showFieldError('err-fecha', 'Seleccione una fecha de registro válida.');
+        hasError = true;
+      }
+      if (!supervisor) {
+        showFieldError('err-supervisor', 'Debe seleccionar un Supervisor.');
+        hasError = true;
+      }
+      if (!modulo) {
+        showFieldError('err-modulo', 'Debe seleccionar un Módulo - Turno.');
+        hasError = true;
+      }
+      if (!acopiador) {
+        showFieldError('err-acopiador', 'Debe seleccionar un Acopiador(a).');
+        hasError = true;
+      }
+      if (!caporal) {
+        showFieldError('err-caporal', 'Debe seleccionar un Caporal.');
+        hasError = true;
+      }
+      if (!modalidad) {
+        showFieldError('err-modalidad', 'Debe seleccionar una Modalidad.');
+        hasError = true;
+      }
+
+      const totalNum = Number(totalRaw);
+      if (!totalRaw || !Number.isInteger(totalNum) || totalNum <= 0 || totalRaw.includes('.') || totalRaw.includes(',')) {
+        showFieldError('err-total', 'Ingrese un número entero positivo mayor a 0 (ej. 15).');
+        hasError = true;
+      }
+
+      if (hasError) {
+        showFeedback('Por favor corrija los campos marcados antes de guardar.', 'error');
+        return;
+      }
+
+      const newRecord = {
+        uuid: generateUUID(),
+        fechaRegistro: fecha,
+        supervisor: supervisor,
+        moduloTurno: modulo,
+        datosAcopiador: acopiador,
+        datosCaporal: caporal,
+        modalidad: modalidad,
+        total: totalNum,
+        estado: 'Pendiente',
+        retries: 0,
+        createdAt: new Date().toISOString(),
+        syncedAt: null,
+        errorMsg: null
+      };
+
+      try {
+        await DB.putRegistro(newRecord);
+        await renderRecordsUI();
+        resetFormForNextEntry();
+
+        if (navigator.onLine) {
+          showFeedback('Registro guardado localmente. Sincronizando con servidor...', 'success');
+          syncPendingRecords(false);
+        } else {
+          showFeedback('Guardado en el teléfono (Sin internet). Se enviará al recuperar señal.', 'warning');
+        }
+      } catch (err) {
+        showFeedback('Error crítico al guardar en memoria local: ' + err.message, 'error');
+      }
+    }
+
+    async function renderRecordsUI() {
+      const records = await DB.getAllRegistros();
+      const listEl = document.getElementById('records-list');
+
+      const pendingCount = records.filter(r => r.estado === 'Pendiente').length;
+      const syncedCount = records.filter(r => r.estado === 'Sincronizado').length;
+      const errorCount = records.filter(r => r.estado === 'Error').length;
+
+      document.getElementById('stat-pending').textContent = pendingCount;
+      document.getElementById('stat-synced').textContent = syncedCount;
+      document.getElementById('stat-error').textContent = errorCount;
+      document.getElementById('badge-pending-count').textContent = pendingCount + errorCount;
+
+      if (records.length === 0) {
+        listEl.innerHTML = `
+          <div class="bg-white rounded-2xl border border-stone-200 p-8 text-center text-stone-500">
+            <p class="font-bold text-stone-700 text-base">Aún no hay registros en este dispositivo</p>
+            <p class="text-sm mt-1">Los reportes que guardes aparecerán aquí con su estado de envío.</p>
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = records.map(r => {
+        let badgeHtml = '';
+        if (r.estado === 'Sincronizado') {
+          badgeHtml = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-extrabold bg-huarmey-greenLight text-emerald-900 border border-huarmey-green/30">✅ Sincronizado</span>`;
+        } else if (r.estado === 'Error') {
+          badgeHtml = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-extrabold bg-huarmey-redLight text-huarmey-red border border-huarmey-red/30">❌ Error</span>`;
+        } else {
+          badgeHtml = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-900">⏳ Pendiente</span>`;
+        }
+
+        return `
+          <article class="bg-white rounded-xl border border-stone-200 p-4 shadow-sm">
+            <div class="flex items-start justify-between gap-2 border-b border-stone-100 pb-2.5 mb-2.5">
+              <div>
+                <span class="text-xs font-bold text-stone-400 block">FECHA: ${r.fechaRegistro}</span>
+                <h3 class="font-extrabold text-stone-900 text-base">${r.datosCaporal}</h3>
+              </div>
+              <div class="text-right">
+                ${badgeHtml}
+                <div class="text-lg font-black text-huarmey-greenDark mt-1">Total: ${r.total}</div>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs text-stone-600">
+              <div><strong class="text-stone-800">Supervisor:</strong> ${r.supervisor || '-'}</div>
+              <div><strong class="text-stone-800">Modalidad:</strong> <span class="px-1.5 py-0.5 rounded bg-stone-100 font-semibold text-stone-800">${r.modalidad || '-'}</span></div>
+              <div><strong class="text-stone-800">Módulo-Turno:</strong> ${r.moduloTurno}</div>
+              <div><strong class="text-stone-800">Acopiador:</strong> ${r.datosAcopiador}</div>
+            </div>
+            ${r.errorMsg ? `<div class="mt-2 p-2 rounded-lg bg-huarmey-redLight text-huarmey-red text-xs font-semibold">${r.errorMsg}</div>` : ''}
+          </article>
+        `;
+      }).join('');
+    }
+
+    function updateNetworkStatusUI() {
+      const badge = document.getElementById('network-badge');
+      const icon = document.getElementById('network-icon');
+      const text = document.getElementById('network-text');
+
+      if (navigator.onLine) {
+        badge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-semibold bg-huarmey-greenLight text-emerald-900 border border-huarmey-green/40';
+        icon.textContent = '🟢';
+        text.textContent = 'En línea';
+        syncPendingRecords(false);
+      } else {
+        badge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-semibold bg-huarmey-redLight text-red-950 border border-huarmey-red/30';
+        icon.textContent = '🟠';
+        text.textContent = 'Sin conexión (Modo Offline)';
+      }
+    }
+
+    /**
+     * ============================================================================
+     * INICIALIZACIÓN DE EVENTOS AL CARGAR EL DOM
+     * ============================================================================
+     */
+    window.addEventListener('DOMContentLoaded', async () => {
+      document.getElementById('year-copy').textContent = new Date().getFullYear();
+      document.getElementById('fecha_registro').value = getTodayLocalISO();
+
+      const savedUrl = localStorage.getItem('HUARMEY_CAPORAL_API_URL');
+      const savedToken = localStorage.getItem('HUARMEY_CAPORAL_API_TOKEN');
+      if (savedUrl) document.getElementById('api-url-input').value = savedUrl;
+      if (savedToken) document.getElementById('api-token-input').value = savedToken;
+
+      if (isApiConfigured()) {
+        const dot = document.getElementById('api-status-dot');
+        dot.textContent = '✅ URL Configurada';
+        dot.className = 'text-huarmey-greenDark font-semibold';
+      }
+
+      await loadMastersFromCache();
+      await renderRecordsUI();
+      updateNetworkStatusUI();
+      fetchMastersFromServer(false);
+
+      window.addEventListener('online', updateNetworkStatusUI);
+      window.addEventListener('offline', updateNetworkStatusUI);
+
+      const tabForm = document.getElementById('tab-form');
+      const tabRecords = document.getElementById('tab-records');
+      const viewForm = document.getElementById('view-form');
+      const viewRecords = document.getElementById('view-records');
+
+      tabForm.addEventListener('click', () => {
+        viewForm.classList.remove('hidden');
+        viewRecords.classList.add('hidden');
+        tabForm.className = 'py-3 px-3 rounded-lg font-bold text-sm sm:text-base bg-white text-stone-900 shadow-sm transition flex items-center justify-center gap-2';
+        tabRecords.className = 'py-3 px-3 rounded-lg font-bold text-sm sm:text-base text-stone-600 hover:text-stone-900 transition flex items-center justify-center gap-2';
+      });
+
+      tabRecords.addEventListener('click', async () => {
+        viewRecords.classList.remove('hidden');
+        viewForm.classList.add('hidden');
+        tabRecords.className = 'py-3 px-3 rounded-lg font-bold text-sm sm:text-base bg-white text-stone-900 shadow-sm transition flex items-center justify-center gap-2';
+        tabForm.className = 'py-3 px-3 rounded-lg font-bold text-sm sm:text-base text-stone-600 hover:text-stone-900 transition flex items-center justify-center gap-2';
+        await renderRecordsUI();
+      });
+
+      document.getElementById('harvest-form').addEventListener('submit', handleFormSubmit);
+      document.getElementById('btn-clear').addEventListener('click', () => {
+        resetFormForNextEntry();
+        showFeedback('Formulario limpiado.', 'info');
+      });
+
+      document.getElementById('btn-refresh-masters').addEventListener('click', () => fetchMastersFromServer(true));
+      document.getElementById('btn-sync-now').addEventListener('click', () => syncPendingRecords(true));
+
+      document.getElementById('btn-save-api-url').addEventListener('click', () => {
+        const val = document.getElementById('api-url-input').value.trim();
+        const tok = document.getElementById('api-token-input').value.trim();
+        if (!val.startsWith('https://script.google.com/')) {
+          showFeedback('La URL debe comenzar con https://script.google.com/', 'error');
+          return;
+        }
+        localStorage.setItem('HUARMEY_CAPORAL_API_URL', val);
+        localStorage.setItem('HUARMEY_CAPORAL_API_TOKEN', tok);
+        const dot = document.getElementById('api-status-dot');
+        dot.textContent = '✅ URL Configurada';
+        dot.className = 'text-huarmey-greenDark font-semibold';
+        showFeedback('Configuración guardada. Descargando listas maestras...', 'success');
+        fetchMastersFromServer(true);
+      });
+
+      let deferredPrompt;
+      const btnInstall = document.getElementById('btn-install-pwa');
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        btnInstall.classList.remove('hidden');
+      });
+
+      btnInstall.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') btnInstall.classList.add('hidden');
+        deferredPrompt = null;
+      });
+    });
+  </script>
+</body>
+</html>
